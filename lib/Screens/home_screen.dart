@@ -67,21 +67,6 @@ class HomeScreen extends StatelessWidget {
                       const SizedBox(
                         height: 25,
                       ),
-                      const Text(
-                        'Abonne toi avec ton compte google',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: CircleAvatar(
-                          radius: 25,
-                          child: Image.asset(
-                              'asset/images/logo.png'),
-                        ),
-                      ),
                     ],
                   ),
                 ),

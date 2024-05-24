@@ -61,6 +61,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             _email = value;
                           },
                         ),
+                        const Text(
+                          'Connecte toi avec ton compte google',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: CircleAvatar(
+                            radius: 25,
+                            child: Image.asset(
+                                'asset/images/logo.png'),
+                          ),
+                        ),
                         CustomBottomScreen(
                           textButton: 'Login',
                           heroTag: 'login_btn',

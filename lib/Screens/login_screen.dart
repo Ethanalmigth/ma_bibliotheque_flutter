@@ -28,6 +28,10 @@ class _LoginScreenState extends State<LoginScreen> {
         return false;
       },
       child: Scaffold(
+        appBar: AppBar(
+          title: Text("Connecter vous"),
+          backgroundColor: Colors.yellow,
+        ),
         backgroundColor: Colors.white,
         body: LoadingOverlay(
           isLoading: _saving,
@@ -45,28 +49,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         const ScreenTitle(title: 'Login'),
                         CustomTextField(
-                          textField: TextField(
-                              onChanged: (value) {
-                                _email = value;
-                              },
-                              style: const TextStyle(
-                                fontSize: 20,
-                              ),
-                              decoration: kTextInputDecoration.copyWith(
-                                  hintText: 'Email')),
+                          hintText: 'Email',
+                          onChanged: (value) {
+                            _email = value;
+                          },
                         ),
+
                         CustomTextField(
-                          textField: TextField(
-                            obscureText: true,
-                            onChanged: (value) {
-                              _password = value;
-                            },
-                            style: const TextStyle(
-                              fontSize: 20,
-                            ),
-                            decoration: kTextInputDecoration.copyWith(
-                                hintText: 'Password'),
-                          ),
+                          hintText: 'Password',
+                          onChanged: (value) {
+                            _email = value;
+                          },
                         ),
                         CustomBottomScreen(
                           textButton: 'Login',

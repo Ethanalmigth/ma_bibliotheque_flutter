@@ -84,29 +84,45 @@ class ScreenTitle extends StatelessWidget {
 }
 
 class CustomTextField extends StatelessWidget {
-  CustomTextField({super.key, required this.textField,this.controller});
-  final TextField textField;
+  CustomTextField({
+    super.key,
+    required this.hintText,
+    this.controller,
+    this.obscureText = false,
+    this.onChanged,
+    this.validator,
+  });
+
+  final String hintText;
   final TextEditingController? controller;
-  final FormFieldValidator<String>? validator = (value) {
-    if (value == null || value.isEmpty) {
-      return 'Tu dois saisir quelque chose';
-    }
-    return null; // Retourne null si la validation réussit
-  };
+  final bool obscureText;
+  final ValueChanged<String>? onChanged;
+  final FormFieldValidator<String>? validator;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 30,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 30),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(40),
-        border: Border.all(
-          width: 2.5,
-          color: kTextColor,
-        ),
+        border: Border.all(width: 2.5, color: kTextColor),
       ),
-      child: textField,
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        onChanged: onChanged,
+        style: const TextStyle(fontSize: 20),
+        decoration: InputDecoration(
+          hintText: hintText,
+          border: InputBorder.none,
+        ),
+        validator: validator ?? (value) {
+          if (value == null || value.isEmpty) {
+            return 'Tu dois saisir quelque chose';
+          }
+          return null;
+        },
+      ),
     );
   }
 }

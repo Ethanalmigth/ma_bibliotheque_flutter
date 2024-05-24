@@ -38,6 +38,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         return true;
       },
       child: Scaffold(
+        appBar: AppBar(
+          title: Text("Abonnez vous"),
+          backgroundColor: Colors.yellow,
+        ),
         backgroundColor: Colors.white,
         body: LoadingOverlay(
           isLoading: _saving,
@@ -61,85 +65,70 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             const ScreenTitle(title: 'Sign Up'),
 
                             CustomTextField(
-                              textField: TextField(
-                                controller: _nameController,
-                                onChanged: (value) {
-                                  _name = value;
-                                },
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                ),
-                                decoration: kTextInputDecoration.copyWith(
-                                  hintText: 'Nom',
-                                ),
-                              ),
-
+                              hintText: 'Nom',
+                              controller: _nameController,
+                              onChanged: (value) {
+                                _name = value;
+                              },
                             ),
 
                             CustomTextField(
-                              textField: TextField(
-                                controller: _firstnameController,
-                                onChanged: (value) {
-                                  _firstname = value;
-                                },
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                ),
-                                decoration: kTextInputDecoration.copyWith(
-                                  hintText: 'Prenom',
-                                ),
-                              ),
+                              hintText: 'Prenom',
+                              controller: _firstnameController,
+                              onChanged: (value) {
+                                _firstname = value;
+                              },
                             ),
                             CustomTextField(
-                              textField: TextField(
-                                controller: _emailController,
-                                onChanged: (value) {
-                                  _email = value;
-                                },
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                ),
-                                decoration: kTextInputDecoration.copyWith(
-                                  hintText: 'Email',
-                                ),
-                              ),
+                              hintText: 'Email',
+                              controller: _emailController,
+                              onChanged: (value) {
+                                _email = value;
+                              },
                             ),
                             CustomTextField(
-                              textField: TextField(
-                                controller: _passwordController,
-                                obscureText: true,
-                                onChanged: (value) {
-                                  _password = value;
-                                },
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                ),
-                                decoration: kTextInputDecoration.copyWith(
-                                  hintText: 'Password',
-                                ),
-                              ),
+                              hintText: 'Password',
+                              controller: _passwordController,
+                              obscureText: true,
+                              onChanged: (value) {
+                                _password = value;
+                              },
                             ),
                             CustomTextField(
-                              textField: TextField(
-                                controller: _confirmPassController,
-                                obscureText: true,
-                                onChanged: (value) {
-                                  _confirmPass = value;
-                                },
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                ),
-                                decoration: kTextInputDecoration.copyWith(
-                                  hintText: 'Confirm Password',
-                                ),
-                              ),
+                              hintText: 'Confirm Password',
+                              controller: _confirmPassController,
+                              obscureText: true,
+                              onChanged: (value) {
+                                _confirmPass = value;
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Tu dois saisir quelque chose';
+                                }
+                                if (value != _passwordController.text) {
+                                  return 'Les mots de passe ne correspondent pas';
+                                }
+                                return null;
+                              },
                             ),
                             CustomBottomScreen(
                               textButton: 'Sign Up',
                               heroTag: 'signup_btn',
                               question: 'Have an account?',
                               buttonPressed: () async {
-
+                                if(_formkey.currentState!.validate()){
+                                  final nom = _nameController.text;
+                                  final prenom = _firstnameController.text;
+                                  final email = _emailController.text;
+                                  final password= _passwordController.text;
+                                  final confpass= _confirmPassController.text;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("Envoie en cours..."))
+                                  );
+                                  FocusScope.of(context).requestFocus(FocusNode());
+                                  print("Il s'appele $nom $prenom son email est $email");
+                                  print("Son mots de passe est $password il a confirmer avec $confpass");
+                                }
                                 /*
                                 FocusManager.instance.primaryFocus?.unfocus();
                                 setState(() {

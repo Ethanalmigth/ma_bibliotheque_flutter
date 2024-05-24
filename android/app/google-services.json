@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "755742981907",
+    "project_id": "mabibliothequeflutter",
+    "storage_bucket": "mabibliothequeflutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755742981907:android:90b89fcfc7bc4c2dfee4e6",
+        "android_client_info": {
+          "package_name": "com.example.ma_bibliotheque_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOlKKOIpkO-46sCavCxZsXdqUOC6QSKaY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

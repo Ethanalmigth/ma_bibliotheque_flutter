@@ -6,7 +6,9 @@ import 'package:ma_bibliotheque_flutter/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ma_bibliotheque_flutter/constants.dart';
 import 'package:loading_overlay/loading_overlay.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:bcrypt/bcrypt.dart';
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
   static String id = 'signup_screen';
@@ -23,12 +25,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
   late String _email;
   late String _password;
   late String _confirmPass;
+
   bool _saving = false;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _firstnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPassController = TextEditingController();
+  DateTime _dateOfBirth=DateTime.now();
+
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               onChanged: (value) {
                                 _name = value;
                               },
+                                icon:Icons.person
                             ),
 
                             CustomTextField(
@@ -78,13 +84,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               onChanged: (value) {
                                 _firstname = value;
                               },
+                                icon: Icons.person
                             ),
+
+                            CustomDateTimeField(
+                              hintText: 'Date de naissance',
+                              validator: (DateTime? value) {
+                                if (value == null) {
+                                  return 'Tu dois saisir une date de naissance';
+                                }
+                                return null;
+                              },
+                              onChanged: (DateTime? value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _dateOfBirth = value;
+                                  });
+                                }
+                              },
+                            ),
+
+
                             CustomTextField(
                               hintText: 'Email',
                               controller: _emailController,
                               onChanged: (value) {
                                 _email = value;
                               },
+                              icon: Icons.email,
                             ),
                             CustomTextField(
                               hintText: 'Password',
@@ -93,6 +120,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               onChanged: (value) {
                                 _password = value;
                               },
+                              icon: Icons.lock,
                             ),
                             CustomTextField(
                               hintText: 'Confirm Password',
@@ -101,6 +129,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               onChanged: (value) {
                                 _confirmPass = value;
                               },
+                              icon: Icons.lock,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Tu dois saisir quelque chose';
@@ -118,12 +147,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 fontSize: 16,
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: CircleAvatar(
-                                radius: 25,
-                                child: Image.asset(
-                                    'asset/images/logo.png'),
+                            GestureDetector(
+                              onTap: () {
+                                // Handle Google sign-up
+                              },
+                              child: Image.asset(
+                                'asset/images/google_logo.png', // Assurez-vous d'avoir le logo Google dans vos assets
+                                height: 50,
                               ),
                             ),
                             CustomBottomScreen(
@@ -131,66 +161,47 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               heroTag: 'signup_btn',
                               question: 'Have an account?',
                               buttonPressed: () async {
-                                if(_formkey.currentState!.validate()){
-                                  final nom = _nameController.text;
-                                  final prenom = _firstnameController.text;
-                                  final email = _emailController.text;
-                                  final password= _passwordController.text;
-                                  final confpass= _confirmPassController.text;
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Envoie en cours..."))
-                                  );
-                                  FocusScope.of(context).requestFocus(FocusNode());
-                                  print("Il s'appele $nom $prenom son email est $email");
-                                  print("Son mots de passe est $password il a confirmer avec $confpass");
-                                }
-                                /*
-                                FocusManager.instance.primaryFocus?.unfocus();
-                                setState(() {
-                                  _saving = true;
-                                });
-                                if (_confirmPass == _password) {
+                                if (_formkey.currentState!.validate()) {
+                                  setState(() {
+                                    _saving = true;
+                                  });
                                   try {
-                                    await _auth.createUserWithEmailAndPassword(
-                                        email: _email, password: _password);
+                                    final nom = _nameController.text;
+                                    final prenom = _firstnameController.text;
+                                    final email = _emailController.text;
+                                    final password = _passwordController.text;
 
-                                    if (context.mounted) {
-                                      signUpAlert(
-                                        context: context,
-                                        title: 'GOOD JOB',
-                                        desc: 'Go login now',
-                                        btnText: 'Login Now',
-                                        onPressed: () {
-                                          setState(() {
-                                            _saving = false;
-                                            Navigator.popAndPushNamed(
-                                                context, SignUpScreen.id);
-                                          });
-                                          Navigator.pushNamed(
-                                              context, LoginScreen.id);
-                                        },
-                                      ).show();
-                                    }
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("Envoie en cours...")),
+                                    );
+
+                                    // Hacher le mot de passe
+                                    String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
+                                    // Ajouter les données à Firestore
+                                    CollectionReference lecteurref = FirebaseFirestore.instance.collection('lecteur');
+                                    await lecteurref.add({
+                                      "nom": nom,
+                                      "prenom": prenom,
+                                      "date_de_naissance": _dateOfBirth,
+                                      "email": email,
+                                      "pass_word": hashedPassword,
+                                    });
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("Inscription réussie!")),
+                                    );
+                                    Navigator.pushNamed(context, HomeScreen.id);
                                   } catch (e) {
-                                    signUpAlert(
-                                        context: context,
-                                        onPressed: () {
-                                          SystemNavigator.pop();
-                                        },
-                                        title: 'SOMETHING WRONG',
-                                        desc: 'Close the app and try again',
-                                        btnText: 'Close Now');
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Erreur: $e")),
+                                    );
+                                  } finally {
+                                    setState(() {
+                                      _saving = false;
+                                    });
                                   }
-                                } else {
-                                  showAlert(
-                                      context: context,
-                                      title: 'WRONG PASSWORD',
-                                      desc:
-                                      'Make sure that you write the same password twice',
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      }).show();
-                                }*/
+                                }
                               },
                               questionPressed: () async {
                                 Navigator.pushNamed(context, LoginScreen.id);

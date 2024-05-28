@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ma_bibliotheque_flutter/constants.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-
+import 'package:date_field/date_field.dart';
 class CustomButton extends StatelessWidget {
   const CustomButton(
       {super.key,
@@ -83,6 +83,51 @@ class ScreenTitle extends StatelessWidget {
   }
 }
 
+class CustomDateTimeField extends StatelessWidget {
+  final String hintText;
+  final ValueChanged<DateTime?>? onChanged;
+  final FormFieldValidator<DateTime>? validator;
+
+  const CustomDateTimeField({
+    Key? key,
+    required this.hintText,
+    this.onChanged,
+    this.validator,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(40),
+        border: Border.all(width: 2.5, color: kTextColor),
+      ),
+      child: DateTimeFormField(
+        decoration: InputDecoration(
+          hintText: hintText,
+          border: InputBorder.none,
+          icon: const Icon(Icons.calendar_today, color: kTextColor),
+          suffixIcon: null,  // This line removes the right icon
+        ),
+        mode: DateTimeFieldPickerMode.date,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: validator ?? (value) {
+          if (value == null) {
+            return 'Tu dois saisir une date de naissance';
+          }
+          return null;
+        },
+        onChanged: onChanged,
+      ),
+    );
+  }
+}
+
+
+
+
+
 class CustomTextField extends StatelessWidget {
   CustomTextField({
     super.key,
@@ -91,6 +136,7 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.onChanged,
     this.validator,
+    this.icon,
   });
 
   final String hintText;
@@ -98,6 +144,7 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final ValueChanged<String>? onChanged;
   final FormFieldValidator<String>? validator;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +162,7 @@ class CustomTextField extends StatelessWidget {
         decoration: InputDecoration(
           hintText: hintText,
           border: InputBorder.none,
+          icon: icon != null ? Icon(icon, color: kTextColor) : null,
         ),
         validator: validator ?? (value) {
           if (value == null || value.isEmpty) {

@@ -59,14 +59,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             onChanged: (value) {
                               _email = value;
                             },
+                            icon: Icons.email,
                           ),
 
                           CustomTextField(
                             hintText: 'Password',
                             controller: _passwordController,
                             onChanged: (value) {
-                              _email = value;
+                              _password = value;
                             },
+                            icon: Icons.lock,
                           ),
                           const Text(
                             'Connecte toi avec ton compte google',
@@ -80,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             icon: CircleAvatar(
                               radius: 25,
                               child: Image.asset(
-                                  'asset/images/logo.png'),
+                                  'asset/images/google_logo.png'),
                             ),
                           ),
                           CustomBottomScreen(
@@ -97,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     FocusScope.of(context).requestFocus(FocusNode());
                                     print("Son est email $email et son mot de passe est $pass ");
                                   }
-                              /*
+
                               FocusManager.instance.primaryFocus?.unfocus();
                               setState(() {
                                 _saving = true;
@@ -129,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'Confirm your email and password and try again',
                                   btnText: 'Try Now',
                                 ).show();
-                              }*/
+                              }
                             },
                             questionPressed: () {
                               signUpAlert(

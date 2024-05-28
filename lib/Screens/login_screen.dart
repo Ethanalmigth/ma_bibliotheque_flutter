@@ -5,6 +5,7 @@ import 'package:ma_bibliotheque_flutter/screens/welcome.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:ma_bibliotheque_flutter/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ma_bibliotheque_flutter/service/auth_service.dart'; // Importez votre AuthService
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,7 +17,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _auth = FirebaseAuth.instance;
-  final _formkey =GlobalKey<FormState>();
+  final _formkey = GlobalKey<FormState>();
   late String _email;
   late String _password;
   bool _saving = false;
@@ -33,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Connecter vous"),
+          title: Text("Connectez-vous"),
           backgroundColor: Colors.yellow,
         ),
         backgroundColor: Colors.white,
@@ -61,7 +62,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                             icon: Icons.email,
                           ),
-
                           CustomTextField(
                             hintText: 'Password',
                             controller: _passwordController,
@@ -71,18 +71,32 @@ class _LoginScreenState extends State<LoginScreen> {
                             icon: Icons.lock,
                           ),
                           const Text(
-                            'Connecte toi avec ton compte google',
+                            'Connectez-vous avec votre compte Google',
                             style: TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
                             ),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () async {
+                              setState(() {
+                                _saving = true;
+                              });
+                              try {
+                                await AuthService().signInWithGoogle(context);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Erreur: $e")),
+                                );
+                              } finally {
+                                setState(() {
+                                  _saving = false;
+                                });
+                              }
+                            },
                             icon: CircleAvatar(
                               radius: 25,
-                              child: Image.asset(
-                                  'asset/images/google_logo.png'),
+                              child: Image.asset('asset/images/google_logo.png'),
                             ),
                           ),
                           CustomBottomScreen(
@@ -90,58 +104,54 @@ class _LoginScreenState extends State<LoginScreen> {
                             heroTag: 'login_btn',
                             question: 'Forgot password?',
                             buttonPressed: () async {
-                                  if(_formkey.currentState!.validate()){
-                                    final email= _emailController.text;
-                                    final pass= _passwordController.text;
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Envoie en cours..."))
-                                    );
-                                    FocusScope.of(context).requestFocus(FocusNode());
-                                    print("Son est email $email et son mot de passe est $pass ");
+                              if (_formkey.currentState!.validate()) {
+                                final email = _emailController.text;
+                                final pass = _passwordController.text;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Envoi en cours...")),
+                                );
+                                FocusScope.of(context).requestFocus(FocusNode());
+                                print("Son email est $email et son mot de passe est $pass ");
+
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                setState(() {
+                                  _saving = true;
+                                });
+                                try {
+                                  await _auth.signInWithEmailAndPassword(
+                                      email: email, password: pass);
+
+                                  if (context.mounted) {
+                                    Navigator.popAndPushNamed(context, WelcomeScreen.id);
                                   }
-
-                              FocusManager.instance.primaryFocus?.unfocus();
-                              setState(() {
-                                _saving = true;
-                              });
-                              try {
-                                await _auth.signInWithEmailAndPassword(
-                                    email: _email, password: _password);
-
-                                if (context.mounted) {
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("Erreur: $e")),
+                                  );
+                                } finally {
                                   setState(() {
                                     _saving = false;
-                                    Navigator.popAndPushNamed(
-                                        context, LoginScreen.id);
                                   });
-                                  Navigator.pushNamed(context, WelcomeScreen.id);
                                 }
-                              } catch (e) {
-                                signUpAlert(
-                                  context: context,
-                                  onPressed: () {
-                                    setState(() {
-                                      _saving = false;
-                                    });
-                                    Navigator.popAndPushNamed(
-                                        context, LoginScreen.id);
-                                  },
-                                  title: 'WRONG PASSWORD OR EMAIL',
-                                  desc:
-                                  'Confirm your email and password and try again',
-                                  btnText: 'Try Now',
-                                ).show();
                               }
                             },
                             questionPressed: () {
                               signUpAlert(
                                 onPressed: () async {
-                                  await FirebaseAuth.instance
-                                      .sendPasswordResetEmail(email: _email);
+                                  if (_emailController.text.isNotEmpty) {
+                                    await FirebaseAuth.instance
+                                        .sendPasswordResetEmail(email: _emailController.text);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("E-mail de réinitialisation envoyé")),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Veuillez entrer un e-mail valide")),
+                                    );
+                                  }
                                 },
                                 title: 'RESET YOUR PASSWORD',
-                                desc:
-                                'Click on the button to reset your password',
+                                desc: 'Click on the button to reset your password',
                                 btnText: 'Reset Now',
                                 context: context,
                               ).show();

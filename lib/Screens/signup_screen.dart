@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:ma_bibliotheque_flutter/components/components.dart';
 import 'package:ma_bibliotheque_flutter/screens/home_screen.dart';
 import 'package:ma_bibliotheque_flutter/screens/login_screen.dart';
@@ -9,6 +8,8 @@ import 'package:loading_overlay/loading_overlay.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bcrypt/bcrypt.dart';
+import 'package:ma_bibliotheque_flutter/service/auth_service.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
   static String id = 'signup_screen';
@@ -37,11 +38,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+    /*  onWillPop: () async {
         Navigator.popAndPushNamed(context, HomeScreen.id);
         return true;
-      },
+      },*/
       child: Scaffold(
         appBar: AppBar(
           title: Text("Abonnez vous"),
@@ -149,7 +150,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                // Handle Google sign-up
+                                AuthService().signInWithGoogle(context);
                               },
                               child: Image.asset(
                                 'asset/images/google_logo.png', // Assurez-vous d'avoir le logo Google dans vos assets

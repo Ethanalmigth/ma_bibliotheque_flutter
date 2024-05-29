@@ -175,6 +175,60 @@ class CustomTextField extends StatelessWidget {
   }
 }
 
+
+class CustomDropdownField extends StatelessWidget {
+  final String hintText;
+  final List<String> items;
+  final ValueChanged<String?>? onChanged;
+  final FormFieldValidator<String>? validator;
+  final IconData? icon;
+  final String? value;
+
+  CustomDropdownField({
+    super.key,
+    required this.hintText,
+    required this.items,
+    this.onChanged,
+    this.validator,
+    this.icon,
+    this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(40),
+        border: Border.all(width: 2.5, color: kTextColor),
+      ),
+      child: DropdownButtonFormField<String>(
+        value: value,
+        decoration: InputDecoration(
+          hintText: hintText,
+          border: InputBorder.none,
+          icon: icon != null ? Icon(icon, color: kTextColor) : null,
+        ),
+        items: items.map((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: onChanged,
+        validator: validator ?? (value) {
+          if (value == null || value.isEmpty) {
+            return 'Tu dois sélectionner quelque chose';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+}
+
+
+
 class CustomBottomScreen extends StatelessWidget {
   const CustomBottomScreen({
     super.key,

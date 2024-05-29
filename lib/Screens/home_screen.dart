@@ -14,7 +14,7 @@ class HomeScreen extends StatelessWidget {
         title: Text("La bibliotheque du peuple"),
         backgroundColor: Colors.yellow,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xFFF4E6C0),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(25),

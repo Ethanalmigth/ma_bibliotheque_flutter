@@ -7,6 +7,7 @@ import 'package:ma_bibliotheque_flutter/constants.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ma_bibliotheque_flutter/service/auth_service.dart';
+import 'package:ma_bibliotheque_flutter/constants.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -21,6 +22,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formkey = GlobalKey<FormState>();
   late String _name;
   late String _firstname;
+  late String _gender;
   late String _email;
   late String _password;
   late String _confirmPass;
@@ -28,6 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _saving = false;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _firstnameController = TextEditingController();
+  final List<String> _genderOptions = ['Homme', 'Femme'];
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPassController = TextEditingController();
@@ -75,6 +78,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             },
                             icon: Icons.person,
                           ),
+
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              hintText: 'Sexe',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(40),
+                                borderSide: BorderSide(width: 2.5, color: kTextColor),
+                              ),
+                              prefixIcon: const Icon(Icons.person, color: kTextColor),
+                            ),
+                            items: _genderOptions.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _gender = value!;
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Tu dois sélectionner un sexe';
+                              }
+                              return null;
+                            },
+                          ),
+
+
+
                           CustomDateTimeField(
                             hintText: 'Date de naissance',
                             validator: (DateTime? value) {
@@ -171,6 +205,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     "nom": _nameController.text,
                                     "prenom": _firstnameController.text,
                                     "date_de_naissance": _dateOfBirth,
+                                    "sexe": _gender,
                                     "email": email,
                                     "userId": userCredential.user!.uid, // Utiliser l'ID utilisateur généré par Firebase Auth
                                   });

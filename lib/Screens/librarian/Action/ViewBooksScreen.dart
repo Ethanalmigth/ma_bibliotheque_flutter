@@ -75,37 +75,42 @@ class BookItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      subtitle: Text('Auteur: $author\nDescription: $description'),
-      trailing: IconButton(
-        icon: Icon(Icons.delete),
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Confirmer la suppression"),
-                content: Text("Êtes-vous sûr de vouloir supprimer ce livre ?"),
-                actions: [
-                  TextButton(
-                    child: Text("Annuler"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  TextButton(
-                    child: Text("Supprimer"),
-                    onPressed: () {
-                      deleteBook(context);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        },
+    return Card(
+      margin: EdgeInsets.all(10),
+      elevation: 5,
+      child: ListTile(
+        leading: FlutterLogo(size: 56),
+        title: Text(title),
+        subtitle: Text('Auteur: $author\nDescription: $description'),
+        trailing: IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Confirmer la suppression"),
+                  content: Text("Êtes-vous sûr de vouloir supprimer ce livre ?"),
+                  actions: [
+                    TextButton(
+                      child: Text("Annuler"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: Text("Supprimer"),
+                      onPressed: () {
+                        deleteBook(context);
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

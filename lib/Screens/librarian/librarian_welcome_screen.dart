@@ -3,6 +3,117 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ma_bibliotheque_flutter/Screens/librarian/Action/AddBookScreen.dart';
 import 'package:ma_bibliotheque_flutter/Screens/librarian/Action/ViewBooksScreen.dart';
+import 'package:ma_bibliotheque_flutter/Screens/librarian/librarian_home_screen.dart';
+import 'package:ma_bibliotheque_flutter/Screens/librarian/statistics_screen.dart';
+import 'package:ma_bibliotheque_flutter/Screens/librarian/announcements_screen.dart';
+
+class LibrarianWelcomeScreen extends StatefulWidget {
+  static String id = 'librarian_welcome_screen';
+
+  @override
+  _LibrarianWelcomeScreenState createState() => _LibrarianWelcomeScreenState();
+}
+
+class _LibrarianWelcomeScreenState extends State<LibrarianWelcomeScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  late User loggedInUser;
+  String libraryName = "";
+  String libraryDescription = "";
+  int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+    fetchLibraryDetails();
+  }
+
+  void getCurrentUser() {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void fetchLibraryDetails() async {
+    if (loggedInUser != null) {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('bibliothecaires')
+          .doc(loggedInUser.uid)
+          .get();
+
+      if (doc.exists) {
+        setState(() {
+          libraryName = doc['nom'] ?? 'Bibliothèque';
+          libraryDescription = doc['description'] ?? '';
+        });
+      }
+    }
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> _widgetOptions = <Widget>[
+      LibrarianHomeScreen(libraryName: libraryName, libraryDescription: libraryDescription),
+      StatisticsScreen(),
+      AnnouncementsScreen(),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Bienvenue, $libraryName'),
+        backgroundColor: Colors.yellow,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              _auth.signOut();
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+      body: _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Accueil',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Statistiques',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.announcement),
+            label: 'Annonces',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+
+
+/*import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ma_bibliotheque_flutter/Screens/librarian/Action/AddBookScreen.dart';
+import 'package:ma_bibliotheque_flutter/Screens/librarian/Action/ViewBooksScreen.dart';
 
 
 class LibrarianWelcomeScreen extends StatefulWidget {
@@ -199,4 +310,4 @@ class AnnouncementsScreen extends StatelessWidget {
       ),
     );
   }
-}
+}*/

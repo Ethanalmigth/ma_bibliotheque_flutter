@@ -188,7 +188,7 @@ class _SignupScreenState extends State<SignUpScreen> {
 
                         // Ajouter des informations supplémentaires à Firestore
                         CollectionReference lecteurref = FirebaseFirestore.instance.collection('lecteur');
-                        await lecteurref.add({
+                        await lecteurref.doc(userCredential.user!.uid).set({
                           "nom": _nameController.text,
                           "prenom": _firstnameController.text,
                           "date_de_naissance": _dateOfBirth,
@@ -224,6 +224,7 @@ class _SignupScreenState extends State<SignUpScreen> {
     );
   }
 }
+
 
 
 

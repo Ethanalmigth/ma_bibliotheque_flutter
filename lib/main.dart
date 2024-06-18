@@ -7,6 +7,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:ma_bibliotheque_flutter/Screens/librarian/librarian_signup_screen.dart';
 import 'package:ma_bibliotheque_flutter/Screens/librarian/librarian_login_screen.dart';
 import 'package:ma_bibliotheque_flutter/Screens/Librarian/librarian_welcome_screen.dart';
+import 'package:ma_bibliotheque_flutter/Screens/librarian/Action/AddBookScreen.dart'; // Assurez-vous d'importer l'écran d'ajout de livre
+import 'package:ma_bibliotheque_flutter/Screens/librarian/Action/ViewBooksScreen.dart';
+
 
 
 
@@ -37,6 +40,8 @@ class MyApp extends StatelessWidget {
         LibrarianSignUpScreen.id: (context)=> LibrarianSignUpScreen(),
         LibrarianLoginScreen.id: (context) => LibrarianLoginScreen(),
         LibrarianWelcomeScreen.id: (context) => LibrarianWelcomeScreen(),
+        AddBookScreen.id: (context) => AddBookScreen(),
+        ViewBooksScreen.id: (context) => ViewBooksScreen(),
 
       },
     );

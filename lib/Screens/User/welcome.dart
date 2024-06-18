@@ -1,36 +1,46 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  static String id = 'welcome_screen';
+  static const String id = 'welcome_screen';
 
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  late User loggedInUser;
-  String userEmail = "";
+  String userName = '';
+  String secondName="";
 
   @override
   void initState() {
     super.initState();
-    getCurrentUser();
+    getUserName();
   }
 
-  void getCurrentUser() {
-    try {
-      final user = _auth.currentUser;
-      if (user != null) {
+  Future<void> getUserName() async {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('lecteur')
+          .doc(user.uid)
+          .get();
+      if (userDoc.exists) {
+        final userData = userDoc.data();
         setState(() {
-          loggedInUser = user;
-          userEmail = loggedInUser.email ?? '';
+          userName = userData?['nom'] ?? 'Utilisateur';
+          secondName= userData?['prenom'] ?? 'Utilisateur';
+        });
+      } else {
+        setState(() {
+          userName = 'Utilisateur';
         });
       }
-    } catch (e) {
-      print(e);
+    } else {
+      setState(() {
+        userName = 'Utilisateur';
+      });
     }
   }
 
@@ -38,12 +48,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Accueil'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              _auth.signOut();
+              FirebaseAuth.instance.signOut();
               Navigator.pop(context);
             },
           ),
@@ -62,113 +72,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Bienvenue, $userEmail',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                '$userName $secondName',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 20),
-              Section(
-                title: 'New Arrivals',
-                courses: [
-                  Course(title: 'Learn Mobile App Development', image: 'assets/learn_mobile_app_dev.png'),
-                  Course(title: 'Learn Mobile App Development', image: 'assets/learn_mobile_app_dev.png'),
-                  Course(title: 'Flutter Recipes & Android', image: 'assets/flutter_recipes.png'),
-                ],
-              ),
-              Section(
-                title: 'Trending Courses',
-                courses: [
-                  Course(title: 'Fundamentals of Dart', image: 'assets/dart_fundamentals.png'),
-                  Course(title: 'React Js Blueprints', image: 'assets/react_js_blueprints.png'),
-                  Course(title: 'Ionic 2', image: 'assets/ionic2.png'),
-                ],
-              ),
-              Section(
-                title: 'Top Picks',
-                courses: [
-                  Course(title: 'Flutter Recipes', image: 'assets/flutter_recipes.png'),
-                  Course(title: 'Flutter Recipes', image: 'assets/flutter_recipes.png'),
-                  Course(title: 'React Js Blueprints', image: 'assets/react_js_blueprints.png'),
-                ],
-              ),
+              // Ajoutez ici vos sections et widgets pour afficher les livres, etc.
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-class Section extends StatelessWidget {
-  final String title;
-  final List<Course> courses;
-
-  Section({required this.title, required this.courses});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          Container(
-            height: 150,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: courses.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: CourseCard(course: courses[index]),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class Course {
-  final String title;
-  final String image;
-
-  Course({required this.title, required this.image});
-}
-
-class CourseCard extends StatelessWidget {
-  final Course course;
-
-  CourseCard({required this.course});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            image: DecorationImage(
-              image: AssetImage(course.image),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        SizedBox(height: 8),
-        Text(
-          course.title,
-          style: TextStyle(fontSize: 14),
-          textAlign: TextAlign.center,
-        ),
-      ],
     );
   }
 }

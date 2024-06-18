@@ -4,6 +4,7 @@ import 'package:ma_bibliotheque_flutter/screens/User/welcome.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:ma_bibliotheque_flutter/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ma_bibliotheque_flutter/service/auth_service.dart'; // Importez votre AuthService
 
 class LoginScreen extends StatefulWidget {
@@ -117,11 +118,27 @@ class _LoginScreenState extends State<LoginScreen> {
                                   _saving = true;
                                 });
                                 try {
-                                  await _auth.signInWithEmailAndPassword(
-                                      email: email, password: pass);
+                                  UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+                                    email: email,
+                                    password: pass,
+                                  );
 
-                                  if (context.mounted) {
-                                    Navigator.popAndPushNamed(context, WelcomeScreen.id);
+                                  // Vérifier si l'utilisateur est un lecteur
+                                  DocumentSnapshot userDoc = await FirebaseFirestore.instance
+                                      .collection('lecteur')
+                                      .doc(userCredential.user!.uid)
+                                      .get();
+
+                                  if (userDoc.exists) {
+                                    // L'utilisateur est un lecteur, naviguer vers l'écran WelcomeScreen
+                                    if (context.mounted) {
+                                      Navigator.popAndPushNamed(context, WelcomeScreen.id);
+                                    }
+                                  } else {
+                                    // L'utilisateur n'est pas un lecteur, afficher un message d'erreur
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("Erreur: Compte non trouvé.")),
+                                    );
                                   }
                                 } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -135,25 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               }
                             },
                             questionPressed: () {
-                              signUpAlert(
-                                onPressed: () async {
-                                  if (_emailController.text.isNotEmpty) {
-                                    await FirebaseAuth.instance
-                                        .sendPasswordResetEmail(email: _emailController.text);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("E-mail de réinitialisation envoyé")),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Veuillez entrer un e-mail valide")),
-                                    );
-                                  }
-                                },
-                                title: 'RESET YOUR PASSWORD',
-                                desc: 'Click on the button to reset your password',
-                                btnText: 'Reset Now',
-                                context: context,
-                              ).show();
+                              // Code pour la réinitialisation du mot de passe
                             },
                           ),
                         ],

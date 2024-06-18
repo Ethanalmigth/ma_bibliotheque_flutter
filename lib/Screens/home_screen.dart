@@ -78,12 +78,12 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(
-                        height: 25,
+                        height: 10,
                       ),
                       Hero(
                         tag: 'librarian_login_btn',
                         child: CustomButton(
-                          buttonText: 'Sign Up as Librarian',
+                          buttonText: 'Login as Librarian',
                           isOutlined: true,
                           onPressed: () {
                             Navigator.pushNamed(context, LibrarianLoginScreen.id);

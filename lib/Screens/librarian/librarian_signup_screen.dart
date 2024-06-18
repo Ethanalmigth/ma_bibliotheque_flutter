@@ -133,8 +133,12 @@ class _LibrarianSignUpScreenState extends State<LibrarianSignUpScreen> {
                           password: password,
                         );
 
-                        CollectionReference librarians = FirebaseFirestore.instance.collection('bibliothecaires');
-                        DocumentReference docRef = await librarians.add({
+                        // Utilisation du `uid` comme identifiant de document
+                        DocumentReference docRef = FirebaseFirestore.instance
+                            .collection('bibliothecaires')
+                            .doc(userCredential.user!.uid);
+
+                        await docRef.set({
                           "nom": _nameController.text,
                           "email": email,
                           "userId": userCredential.user!.uid,

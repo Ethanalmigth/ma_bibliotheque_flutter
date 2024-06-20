@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ma_bibliotheque_flutter/Screens/librarian/Action/AddBookScreen.dart';
 import 'package:ma_bibliotheque_flutter/Screens/librarian/Action/ViewBooksScreen.dart';
+import 'package:ma_bibliotheque_flutter/Screens/librarian/Action/SearchBooksScreen.dart';
 
 class LibrarianHomeScreen extends StatelessWidget {
   final String libraryName;
@@ -44,7 +45,7 @@ class LibrarianHomeScreen extends StatelessWidget {
                     leading: Icon(Icons.search),
                     title: Text('Rechercher un livre'),
                     onTap: () {
-                      // Naviguez vers l'écran de recherche de livre
+                      Navigator.pushNamed(context, SearchBooksScreen.id);
                     },
                   ),
                   ListTile(
